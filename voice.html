@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Speech Recognition</title>
+</head>
+<body>
+  <select id="languageSelect">
+    <option value="en-US">English (US)</option>
+    <option value="bn-IN">Bengali (India)</option>
+    <option value="hi-IN">Hindi (India)</option>
+    <option value="gu-IN">Gujarati (India)</option>
+    <option value="pa-IN">Punjabi (India)</option>
+    <option value="te-IN">Telugu (India)</option>
+    <option value="kn-IN">Kannada (India)</option>
+    <option value="ml-IN">Malayalam (India)</option>
+    <option value="or-IN">Odia (India)</option>
+    <option value="sa-IN">Grantha (India)</option>
+    <option value="ta-IN">Tamil (India)</option>
+    <!-- Add more options for different languages as needed -->
+  </select>
+  <button id="start" onclick="startRecognition()">Start Recognition</button>
+  <button id="end" onclick="stopRecognition()">Stop Recognition</button>
+  <p id="output"></p>
+
+  <script>
+    const output = document.getElementById('output');
+    const languageSelect = document.getElementById('languageSelect');
+    let recognition;
+
+    const symbolMappings = {
+      "full stop": ".",
+      "dot": ".",
+      "comma": ",",
+      "question mark": "?",
+      "exclamation mark": "!",
+      "colon": ":",
+      "semicolon": ";",
+      "hyphen": "-",
+      "underscore": "_",
+      "slash": "/",
+      "backslash": "\\",
+      "pipe": "|",
+      "ampersand": "&",
+      "at sign": "@",
+      "hash": "#",
+      "dollar sign": "$",
+      "percent": "%",
+      "caret": "^",
+      "asterisk": "*",
+      "tilde": "~",
+      "backtick": "`",
+      "quote": "\"",
+      "single quote": "'",
+      "curly bracket on": "{",
+      "curly bracket off": "}",
+      "curly bracket close": "}",
+      "big bracket on": "[",
+      "big bracket off": "]",
+      "bracket on": "(",
+      "bracket off": ")",
+      // Hindi mappings
+      "पूर्ण विराम": "।",
+      "कॉमा": "،",
+
+      // Bengali mappings
+      "পূর্ণবিরাম": "।",
+      "কমা": ","
+      // Add more mappings as needed
+    };
+
+    function startRecognition() {
+      const selectedLanguage = languageSelect.value;
+      recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+      recognition.lang = selectedLanguage; // Set the language for speech recognition
+      recognition.continuous = true; // Enable continuous listening
+
+      recognition.onresult = function(event) {
+        let transcript = event.results[event.results.length - 1][0].transcript;
+        const lastResult = event.results[event.results.length - 1];
+        const lastTranscript = lastResult.isFinal ? transcript + " " : transcript;
+        const cleanedTranscript = cleanTranscript(lastTranscript);
+        output.textContent += cleanedTranscript;
+      };
+
+      recognition.onend = function() {
+        recognition.start(); // Restart the recognition when it stops
+      };
+
+      recognition.start();
+    }
+
+    function stopRecognition() {
+      recognition.stop();
+      // Stop the continuous recognition
+      output.innerHTML="";
+    }
+
+    function cleanTranscript(transcript) {
+      // Replace spoken words with their corresponding symbols
+      Object.keys(symbolMappings).forEach(word => {
+        const regex = new RegExp(word, 'gi');
+        transcript = transcript.replace(regex, symbolMappings[word]);
+      });
+      return transcript;
+    }
+  </script>
+</body>
+</html>
