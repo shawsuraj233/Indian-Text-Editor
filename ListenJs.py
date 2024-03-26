@@ -12,7 +12,6 @@ chrome_options.add_argument("--use-fake-ui-for-media-stream")
 chrome_options.add_argument("--headless=new")
 
 #Installing the nessasary driver and loading the chrome app
-driver_path = os.path.abspath("chromedriver")
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
 
 voice_path = os.path.abspath("voice.html")
